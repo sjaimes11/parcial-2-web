@@ -34,7 +34,7 @@ describe('PacienteMedicoService', () => {
     medicoRepository.clear();
 
     paciente = await pacienteRepository.save({
-      nombre: 'Paciente 1',
+      nombre: 'roberto',
       genero: 'Masculino',
     });
 
@@ -43,8 +43,8 @@ describe('PacienteMedicoService', () => {
       const medico: MedicoEntity = await medicoRepository.save({
         nombre: `Medico ${i}`,
         especialidad: 'Especialidad',
-        telefono: '123456789',
-      });
+        telefono: '302555555', 
+            });
       medicosList.push(medico);
     }
   };
@@ -55,13 +55,15 @@ describe('PacienteMedicoService', () => {
 
   it('addMedicoToPaciente should add a medico to a paciente', async () => {
     const newPaciente: PacienteEntity = await pacienteRepository.save({
-      nombre: 'Puki',
-      genero: 'Femenino',
+      nombre: 'Santiago',
+      genero: 'Masculino',
     });
-    const newMedico: MedicoEntity = await medicoRepository.save({
-      nombre: 'Dr. House',
-      especialidad: 'Oncología',
-      telefono: '987654321',
+
+
+    const newMedico = await medicoRepository.save({
+      nombre: 'ana',
+      especialidad: 'Especialidad',
+      telefono: '302555555',
     });
 
     const result = await service.addMedicoToPaciente(
@@ -94,9 +96,9 @@ describe('PacienteMedicoService', () => {
     }
 
     const newMedico = await medicoRepository.save({
-      nombre: 'Dr. House',
-      especialidad: 'Oncología',
-      telefono: '987654321',
+      nombre: 'ana',
+      especialidad: 'Especialidad',
+      telefono: '302555555',
     });
 
     await expect(
