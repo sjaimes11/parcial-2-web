@@ -12,16 +12,8 @@ export class DiagnosticoService {
     private readonly diagnosticoRepository: Repository<DiagnosticoEntity>,
   ) {}
 
-  async create(diagnostico: DiagnosticoEntity): Promise<DiagnosticoEntity> {
-    // Validar que la descripción tenga como máximo 200 caracteres
-    if (diagnostico.descripcion.length > 200) {
-      throw new BusinessLogicException(
-        'The description must not exceed 200 characters',
-        BusinessError.BAD_REQUEST,
-      );
-    }
-
-    return await this.diagnosticoRepository.save(diagnostico);
+  async findAll(): Promise<DiagnosticoEntity[]> {
+    return await this.diagnosticoRepository.find();
   }
 
   async findOne(id: string): Promise<DiagnosticoEntity> {
@@ -40,13 +32,21 @@ export class DiagnosticoService {
     return diagnostico;
   }
 
-  async findAll(): Promise<DiagnosticoEntity[]> {
-    return await this.diagnosticoRepository.find({ relations: ['pacientes'] });
+  async create(diagnostico: DiagnosticoEntity): Promise<DiagnosticoEntity> {
+    // Validar que la descripción tenga como máximo 200 caracteres
+    if (diagnostico.descripcion.length > 200) {
+      throw new BusinessLogicException(
+        'The description must not exceed 200 characters',
+        BusinessError.BAD_REQUEST,
+      );
+    }
+
+    return await this.diagnosticoRepository.save(diagnostico);
   }
 
   async delete(id: string): Promise<void> {
     const diagnostico = await this.diagnosticoRepository.findOne({
-      where: { id },
+      where: { id }, relations: ['pacientes'], // Relación con pacientes
     });
 
     if (!diagnostico) {

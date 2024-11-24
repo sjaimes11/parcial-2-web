@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { PacienteEntity } from './paciente.entity/paciente.entity';
-import { BusinessLogicException, BusinessError } from '../shared/errors/business-errors';
-
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { BusinessError, BusinessLogicException } from '../shared/errors/business-errors';
 
 @Injectable()
 export class PacienteService {
@@ -13,50 +12,53 @@ export class PacienteService {
   ) {}
 
   async findAll(): Promise<PacienteEntity[]> {
-    return await this.pacienteRepository.find({ relations: ['medicos', 'diagnosticos'] });
+    return this.pacienteRepository.find();
   }
 
   async findOne(id: string): Promise<PacienteEntity> {
     const paciente = await this.pacienteRepository.findOne({
       where: { id },
-      relations: ['medicos', 'diagnosticos'],
+      relations: ['diagnosticos', 'medicos'],
     });
-    if (!paciente)
+
+    if (!paciente) {
       throw new BusinessLogicException(
         'El paciente con el id dado no fue encontrado',
         BusinessError.NOT_FOUND,
       );
+    }
 
     return paciente;
   }
 
   async create(paciente: PacienteEntity): Promise<PacienteEntity> {
-    if (!paciente.nombre || paciente.nombre.trim().length < 3)
+    if (paciente.nombre.length < 3) {
       throw new BusinessLogicException(
         'El nombre del paciente debe tener al menos 3 caracteres',
         BusinessError.BAD_REQUEST,
       );
-
-    return await this.pacienteRepository.save(paciente);
+    }
+    return this.pacienteRepository.save(paciente);
   }
 
-  async delete(id: string) {
+  async delete(id: string): Promise<void> {
     const paciente = await this.pacienteRepository.findOne({
       where: { id },
-      relations: ['diagnosticos'],
+      relations: ['diagnosticos', 'medicos'],
     });
-    if (!paciente)
+    if (!paciente) {
       throw new BusinessLogicException(
         'El paciente con el id dado no fue encontrado',
         BusinessError.NOT_FOUND,
       );
+    }
 
-    if (paciente.diagnosticos && paciente.diagnosticos.length > 0)
+    if (paciente.diagnosticos.length > 0) {
       throw new BusinessLogicException(
-        'No se puede eliminar un paciente que tiene diagnósticos asociados',
+        'No se puede eliminar un paciente con diagnósticos asociados',
         BusinessError.PRECONDITION_FAILED,
       );
-
-    await this.pacienteRepository.remove(paciente);
+    }
+    await this.pacienteRepository.delete(paciente.id);
   }
 }

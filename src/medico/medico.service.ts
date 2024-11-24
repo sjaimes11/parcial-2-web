@@ -12,17 +12,9 @@ export class MedicoService {
     private readonly medicoRepository: Repository<MedicoEntity>,
   ) {}
 
-  async create(medico: MedicoEntity): Promise<MedicoEntity> {
-    // Validar que el nombre y la especialidad no estén vacíos
-    if (!medico.nombre || medico.nombre.trim() === '') {
-      throw new BusinessLogicException('The name must not be empty', BusinessError.BAD_REQUEST);
-    }
 
-    if (!medico.especialidad || medico.especialidad.trim() === '') {
-      throw new BusinessLogicException('The specialty must not be empty', BusinessError.BAD_REQUEST);
-    }
-
-    return await this.medicoRepository.save(medico);
+  async findAll(): Promise<MedicoEntity[]> {
+    return await this.medicoRepository.find();
   }
 
   async findOne(id: string): Promise<MedicoEntity> {
@@ -41,8 +33,20 @@ export class MedicoService {
     return medico;
   }
 
-  async findAll(): Promise<MedicoEntity[]> {
-    return await this.medicoRepository.find({ relations: ['pacientes'] });
+  async create(medico: MedicoEntity): Promise<MedicoEntity> {
+    if (medico.nombre === '') {
+      throw new BusinessLogicException(
+        'The name must not be empty',
+        BusinessError.PRECONDITION_FAILED,
+      );
+    }
+    if (medico.especialidad === '') {
+      throw new BusinessLogicException(
+        'The specialty must not be empty',
+        BusinessError.PRECONDITION_FAILED,
+      );
+    }
+    return this.medicoRepository.save(medico);
   }
 
   async delete(id: string): Promise<void> {
@@ -50,22 +54,18 @@ export class MedicoService {
       where: { id },
       relations: ['pacientes'],
     });
-
     if (!medico) {
       throw new BusinessLogicException(
         'The doctor with the given id was not found',
         BusinessError.NOT_FOUND,
       );
     }
-
-    // Validar que no tenga pacientes asociados
-    if (medico.pacientes && medico.pacientes.length > 0) {
+    if (medico.pacientes.length > 0) {
       throw new BusinessLogicException(
         'The doctor cannot be deleted because it has associated patients',
         BusinessError.PRECONDITION_FAILED,
       );
     }
-
-    await this.medicoRepository.remove(medico);
+    await this.medicoRepository.delete(medico.id);
   }
 }

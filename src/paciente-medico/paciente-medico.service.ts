@@ -16,7 +16,7 @@ export class PacienteMedicoService {
     private readonly medicoRepository: Repository<MedicoEntity>,
   ) {}
 
-  async addMedicoToPaciente(pacienteId: string, medicoId: string): Promise<PacienteEntity> {
+  async addMedicoToPaciente( pacienteId: string, medicoId: string): Promise<PacienteEntity> {
     // Verificar que el paciente exista
     const paciente = await this.pacienteRepository.findOne({
       where: { id: pacienteId },
@@ -24,13 +24,14 @@ export class PacienteMedicoService {
     });
     if (!paciente) {
       throw new BusinessLogicException(
-        'The patient with the given id was not found',
+        'El paciente con el id dado no fue encontrado',
         BusinessError.NOT_FOUND,
       );
     }
 
     // Verificar que el médico exista
-    const medico = await this.medicoRepository.findOne({ where: { id: medicoId } });
+    const medico = await this.medicoRepository.findOne({ 
+      where: { id: medicoId } });
     if (!medico) {
       throw new BusinessLogicException(
         'The doctor with the given id was not found',
