@@ -37,7 +37,7 @@ export class DiagnosticoService {
     if (diagnostico.descripcion.length > 200) {
       throw new BusinessLogicException(
         'The description must not exceed 200 characters',
-        BusinessError.BAD_REQUEST,
+        BusinessError.PRECONDITION_FAILED,
       );
     }
 

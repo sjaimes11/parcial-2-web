@@ -24,7 +24,7 @@ import {
       return this.diagnosticoService.findAll();
     }
   
-    @Get(':diagnosticoId')
+    @Get('/:diagnosticoId')
     async findOne(@Param('diagnosticoId') diagnosticoId: string) {
       return this.diagnosticoService.findOne(diagnosticoId);
     }

@@ -1,0 +1,321 @@
+{
+	"info": {
+		"_postman_id": "3f26feaf-5762-46c5-87fc-0c4599f3cee1",
+		"name": "PacienteMedico",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29785829"
+	},
+	"item": [
+		{
+			"name": "Agregar un Paciente",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = pm.response.json();\r",
+							"pm.globals.set(\"paciente_id\", data.id);\r",
+							"\r",
+							"pm.globals.set(\"invalid_paciente_id\", \"00000000-0000-0000-0000-000000000000\");\r",
+							"\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"  pm.response.to.have.status(201);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"nombre\": \"Paulina Arrazola\",\r\n  \"genero\": \"Mujer\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/v1/pacientes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"pacientes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Agregar Médicos",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = pm.response.json();\r",
+							"pm.globals.set(\"medico1_id\", data.id); // Reemplaza X por el número del médico\r",
+							"\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"  pm.response.to.have.status(201);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"nombre\": \"Dr. victor puerto\",\r\n  \"especialidad\": \"Pediatría\",\r\n  \"telefono\": \"0987654321\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/v1/medicos",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"medicos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Asociar Médicos al Paciente",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"  pm.response.to.have.status(201);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/v1/pacientes/{{paciente_id}}/medicos/{{medico1_id}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"pacientes",
+						"{{paciente_id}}",
+						"medicos",
+						"{{medico1_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Verificar que el Paciente tiene 5 Médicos",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Number of medicos = 5', function () {\r",
+							"  var data = pm.response.json();\r",
+							"  pm.expect(data.medicos.length).to.equal(5);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/v1/pacientes/{{paciente_id}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"pacientes",
+						"{{paciente_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Intentar Agregar un Médico al Paciente Inválido",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 412\", function () {\r",
+							"  pm.response.to.have.status(412);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Get expected error message\", function () {\r",
+							"  var data = pm.response.json();\r",
+							"  pm.expect(data.message).to.eql(\"No se puede agregar más de 5 médicos a un paciente\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/v1/pacientes/{{invalid_paciente_id}}/medicos/{{medico1_id}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"pacientes",
+						"{{invalid_paciente_id}}",
+						"medicos",
+						"{{medico1_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Agregar un médico a un paciente que no existe",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {\r",
+							"  pm.response.to.have.status(404);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Error message is correct\", function () {\r",
+							"  var data = pm.response.json();\r",
+							"  pm.expect(data.message).to.eql(\"El paciente con el id dado no fue encontrado\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/v1/pacientes/{{invalid_paciente_id}}/medicos/{{medico1_id}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"pacientes",
+						"{{invalid_paciente_id}}",
+						"medicos",
+						"{{medico1_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Agregar un médico que no existe a un paciente",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {\r",
+							"  pm.response.to.have.status(404);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Error message is correct\", function () {\r",
+							"  var data = pm.response.json();\r",
+							"  pm.expect(data.message).to.eql(\"The doctor with the given id was not found\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/v1/pacientes/{{paciente_id}}/medicos/{{invalid_medico_id}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"pacientes",
+						"{{paciente_id}}",
+						"medicos",
+						"{{invalid_medico_id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
